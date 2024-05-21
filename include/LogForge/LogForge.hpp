@@ -277,7 +277,8 @@ namespace LogForge
 				/// Construct a new [PrefixedPrinter] with the specified printer and severity prefixes.
 				constexpr explicit PrefixedPrinter(Printer printer, SeverityPrefixes prefixes) noexcept :
 					m_RealPrinter(std::move(printer)),
-					m_SeverityPrefixes(std::move(prefixes))
+					m_SeverityPrefixes(std::move(prefixes)),
+					m_LongestPrefixLength(GetLongestPrefixLength(m_SeverityPrefixes | std::ranges::views::values))
 				{
 				}
 
@@ -288,7 +289,9 @@ namespace LogForge
 					const auto prefix = GetPrefixForSeverity(logEvent.Severity);
 					if (prefix == std::nullopt) return printedLines;
 
-					const auto leading = prefix.value() + L' ';
+					const auto spacing = m_LongestPrefixLength - prefix.value().length();
+					const auto padding = Line(spacing, L' ');
+					const auto leading = prefix.value() + padding + L' ';
 					const auto lines = printedLines | std::views::transform([&leading](const Line& line)
 					{
 						return leading + line;
@@ -317,11 +320,22 @@ namespace LogForge
 					return std::nullopt;
 				}
 
+				[[nodiscard]] constexpr static std::size_t GetLongestPrefixLength(const auto prefixes)
+				{
+					return std::ranges::max(prefixes | std::ranges::views::transform([](const Line& prefix)
+					{
+						return prefix.length();
+					}));
+				}
+
 				/// The real printer that is used to print the log event.
 				Printer m_RealPrinter;
 
 				/// The severity prefixes that are used to prefix the log messages.
 				SeverityPrefixes m_SeverityPrefixes;
+
+				/// The length of the longest prefix.
+				std::size_t m_LongestPrefixLength;
 
 			};
 
