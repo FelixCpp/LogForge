@@ -74,7 +74,7 @@ Using the library would produce outputs like the following:
 
 ## Additional Information
 
-On Windows, you can use the following code to enable ANSI escape codes in the console:
+On Windows, you can use the following code to enable virtual terminal processing in order to see colors etc.:
 
 ```cpp
 #include <Windows.h>
