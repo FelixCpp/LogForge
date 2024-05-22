@@ -6,7 +6,6 @@ It is designed to be easy to use and easy to extend.
 This library can be used completely without inheritance in order to avoid making calls into virtual lookup tables. On the other hand it is also possible to instantiate instances of the corresponding interfaces such as LogOutput, LogFilter, LogPrinter, Logger etc. The example below shows how to use the library without inheritance.
 
 Note that this library is under development. The API may change in the future.
-
 This library is inspired by the [Dart Logger](https://pub.dev/packages/logger) package.
 
 ## Filters
@@ -18,14 +17,17 @@ This library is inspired by the [Dart Logger](https://pub.dev/packages/logger) p
 
 ## Outputs
 
-| Modifier		| Description                                   | Customizable  |
-| ------------- | --------------------------------------------- | ------------- |
-| Stream		| Outputs to a stream							| Yes			|
+| Modifier		| Description						|
+| ------------- | ---------------------------------	|
+| Stream		| Outputs to a stream				|
+| Multi			| Outputs to a multiple log outputs	|
 
 ## Printers
 
 | Modifier		| Description                                   | Customizable  |
 | ------------- | --------------------------------------------- | ------------- |
+| Lines			| Print only the message without time etc.		| No			|
+| LogFmt		| Print the whole event in logfmt format		| Yes			|
 | Timestamped	| Add a timestamp above the message				| Yes			|
 | Located		| Add a source location above the message		| Yes			|
 | Boxed			| Wrap the message inside a box					| No			|	
@@ -43,7 +45,7 @@ int main() {
 	using namespace LogForge;
 
 	// The order matters! Try different orders to see the difference
-	const auto printer = Messages()
+	const auto printer = Message() //< Could also be LogFmt().
 		>> Timestamped()    // Add timestamp to the output
 		>> Located()        // Add source location to the output
 		>> Boxed()          // Surround the output with a box
@@ -51,8 +53,8 @@ int main() {
 		>> Colorized()      // Add color to the output
 
 	const auto logger = LogForge::DefaultLogger(
-		Filters::Development::DevelopmentFilter(LogForge::Severity::Trace),
-		Output::Stream::StreamOutput(std::wcout),
+		DevelopmentFilter(),
+		StreamOutput(std::wcout),
 		printer
 	);
 
@@ -69,3 +71,5 @@ Using the library would produce outputs like the following:
 
 ![Colorized Output](screenshots/Example_Output_1.png)
 ![Colorized Output](screenshots/Example_Output_0.png)
+
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
